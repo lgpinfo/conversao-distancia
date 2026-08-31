@@ -1,0 +1,51 @@
+:root {
+    --grad-start: #6a5af9;
+    --grad-end: #38b6ff;
+}
+
+body {
+    background: linear-gradient(135deg, #6a5af9, #38b6ff 60%, #6bd4d0);
+    min-height: 100vh;
+}
+
+.navbar-gradient {
+    background: linear-gradient(90deg, var(--grad-start), var(--grad-end)) !important;
+}
+
+.app-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    max-width: 560px;
+    margin: 5rem auto 3rem;
+}
+
+.app-card h1 {
+    color: #3d3196;
+    font-weight: 700;
+    font-size: 1.75rem;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--grad-start), var(--grad-end));
+    border: none;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    opacity: 0.9;
+    background: linear-gradient(90deg, var(--grad-start), var(--grad-end));
+}
+
+.result-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #eef1ff;
+    border-left: 4px solid var(--grad-start);
+}
+
+footer.footer {
+    background: rgba(255, 255, 255, 0.85) !important;
+}
