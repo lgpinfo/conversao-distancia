@@ -4,7 +4,7 @@ metadata:
   name: conversao-distancia
   namespace: producao
 spec:
-  replicas: 10
+  replicas: 2
   selector:
     matchLabels:
       app: conversao-distancia
@@ -13,6 +13,13 @@ spec:
       labels:
         app: conversao-distancia
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: conversao-distancia
       containers:
         - name: conversao-distancia
           image: lproenca/conversao-distancia:v1
