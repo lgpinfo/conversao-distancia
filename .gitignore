@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Terraform -- nunca versionar state (guarda senha do banco em texto puro)
+Terraform/.terraform/
+Terraform/*.tfstate
+Terraform/*.tfstate.*
+Terraform/*.tfvars
+Terraform/crash.log
+Terraform/override.tf
+Terraform/override.tf.json

@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  DO_CLUSTER: k8s-1-36-3-do-2-nyc1-1788262016721
+  DO_CLUSTER: k8s-conversao-distancia
   IMAGE_NAME: lproenca/conversao-distancia
 
 jobs:
