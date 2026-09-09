@@ -4,10 +4,11 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, aws]
 
 env:
-  DO_CLUSTER: k8s-conversao-distancia
+  EKS_CLUSTER: eks-conversao-distancia
+  AWS_REGION: us-east-1
   IMAGE_NAME: lproenca/conversao-distancia
 
 jobs:
@@ -73,13 +74,15 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Conectar ao cluster
-        run: doctl kubernetes cluster kubeconfig save ${{ env.DO_CLUSTER }}
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
 
       - name: Aplicar manifesto com a imagem do build atual
         run: |
@@ -98,13 +101,15 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Conectar ao cluster
-        run: doctl kubernetes cluster kubeconfig save ${{ env.DO_CLUSTER }}
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
 
       - name: Aplicar manifesto com a imagem do build atual
         run: |

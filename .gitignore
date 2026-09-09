@@ -136,3 +136,11 @@ Terraform/*.tfvars
 Terraform/crash.log
 Terraform/override.tf
 Terraform/override.tf.json
+
+Terraform-AWS/.terraform/
+Terraform-AWS/*.tfstate
+Terraform-AWS/*.tfstate.*
+Terraform-AWS/*.tfvars
+Terraform-AWS/crash.log
+Terraform-AWS/override.tf
+Terraform-AWS/override.tf.json
