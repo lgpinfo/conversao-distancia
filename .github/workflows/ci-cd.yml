@@ -1,15 +1,17 @@
 name: CI/CD Conversao-Distancia
-run-name: Infraestrutura AWS via Terraform - Pipeline com EKS
+run-name: Infraestrutura Multi-Cloud via Terraform - Pipeline com EKS/AKS
 
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, aws]
+    branches: [main, aws, azure]
 
 env:
   EKS_CLUSTER: eks-conversao-distancia
   AWS_REGION: us-east-1
+  AKS_CLUSTER: aks-conversao-distancia
+  AZURE_RESOURCE_GROUP: rg-conversao-distancia
   IMAGE_NAME: lproenca/conversao-distancia
 
 jobs:
@@ -37,7 +39,7 @@ jobs:
   build-and-push:
     name: Build e publicação da imagem
     needs: ci
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws' || github.ref == 'refs/heads/azure')
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.sha_short }}
@@ -67,8 +69,9 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
 
   deploy-homologacao:
-    name: Deploy em Homologação
+    name: Deploy em Homologação (AWS)
     needs: build-and-push
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
     runs-on: ubuntu-latest
     environment: homologacao
     steps:
@@ -94,8 +97,9 @@ jobs:
         run: kubectl rollout status deployment/conversao-distancia -n homologacao
 
   deploy-producao:
-    name: Deploy em Produção
+    name: Deploy em Produção (AWS)
     needs: [build-and-push, deploy-homologacao]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
     runs-on: ubuntu-latest
     environment: producao
     steps:
@@ -111,6 +115,58 @@ jobs:
 
       - name: Conectar ao cluster
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
+
+      - name: Aplicar manifesto com a imagem do build atual
+        run: |
+          sed -i "s|${{ env.IMAGE_NAME }}:.*|${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }}|" k8s/manifesto-producao.yaml
+          kubectl apply -f k8s/manifesto-producao.yaml
+
+      - name: Aguardar rollout
+        run: kubectl rollout status deployment/conversao-distancia -n producao
+
+  deploy-homologacao-azure:
+    name: Deploy em Homologação (Azure)
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/azure'
+    runs-on: ubuntu-latest
+    environment: homologacao
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Conectar ao cluster
+        run: az aks get-credentials --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER }} --overwrite-existing
+
+      - name: Aplicar manifesto com a imagem do build atual
+        run: |
+          sed -i "s|${{ env.IMAGE_NAME }}:.*|${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }}|" k8s/manifesto-homologacao.yaml
+          kubectl apply -f k8s/manifesto-homologacao.yaml
+
+      - name: Aguardar rollout
+        run: kubectl rollout status deployment/conversao-distancia -n homologacao
+
+  deploy-producao-azure:
+    name: Deploy em Produção (Azure)
+    needs: [build-and-push, deploy-homologacao-azure]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/azure'
+    runs-on: ubuntu-latest
+    environment: producao
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Conectar ao cluster
+        run: az aks get-credentials --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER }} --overwrite-existing
 
       - name: Aplicar manifesto com a imagem do build atual
         run: |
