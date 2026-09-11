@@ -47,9 +47,9 @@ variable "node_count" {
 }
 
 variable "aks_version" {
-  description = "Versao do Kubernetes no AKS. Confirme as disponiveis com: az aks get-versions --location <location> -o table"
+  description = "Versao do Kubernetes no AKS. Precisa ser uma versao com SupportPlan 'KubernetesOfficial' (nao so 'AKSLongTermSupport', que exige plano pago) -- confirme as disponiveis com: az aks get-versions --location <location> -o table"
   type        = string
-  default     = "1.31"
+  default     = "1.34.10"
 }
 
 variable "db_sku_name" {
