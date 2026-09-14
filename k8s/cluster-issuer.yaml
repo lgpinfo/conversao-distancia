@@ -1,0 +1,37 @@
+# ClusterIssuer = recurso do cert-manager, valido pro cluster inteiro (nao e
+# por namespace, por isso serve pra homologacao e producao ao mesmo tempo).
+#
+# Dois issuers: staging primeiro (pra validar o fluxo sem gastar o limite de
+# 5 certificados/semana do Let's Encrypt), prod depois de confirmar que
+# funciona. O Ingress escolhe qual usar via annotation
+# "cert-manager.io/cluster-issuer".
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: leandro.proenca0@hotmail.com
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: leandro.proenca0@hotmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx

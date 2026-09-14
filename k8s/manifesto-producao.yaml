@@ -79,7 +79,7 @@ metadata:
   name: conversao-distancia
   namespace: producao
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: conversao-distancia
   ports:

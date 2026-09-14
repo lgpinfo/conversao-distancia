@@ -90,6 +90,9 @@ jobs:
           sed -i "s|${{ env.IMAGE_NAME }}:.*|${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }}|" k8s/manifesto-homologacao.yaml
           kubectl apply -f k8s/manifesto-homologacao.yaml
 
+      - name: Aplicar Ingress (domínio + TLS)
+        run: kubectl apply -f k8s/ingress-homologacao-aws.yaml
+
       - name: Aguardar rollout
         run: kubectl rollout status deployment/conversao-distancia -n homologacao
 
@@ -116,6 +119,9 @@ jobs:
         run: |
           sed -i "s|${{ env.IMAGE_NAME }}:.*|${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }}|" k8s/manifesto-producao.yaml
           kubectl apply -f k8s/manifesto-producao.yaml
+
+      - name: Aplicar Ingress (domínio + TLS)
+        run: kubectl apply -f k8s/ingress-producao-aws.yaml
 
       - name: Aguardar rollout
         run: kubectl rollout status deployment/conversao-distancia -n producao

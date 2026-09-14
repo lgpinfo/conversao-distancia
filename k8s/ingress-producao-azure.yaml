@@ -1,0 +1,28 @@
+# Comeca no issuer de staging (igual fizemos na AWS): valida o fluxo sem
+# gastar o limite de 5 certificados/semana do Let's Encrypt. Troca pra
+# "letsencrypt-prod" so depois de confirmar que o certificado de staging
+# saiu certo.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: conversao-distancia
+  namespace: producao
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - azure.lgpcloud.com.br
+      secretName: conversao-distancia-tls-producao-azure
+  rules:
+    - host: azure.lgpcloud.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: conversao-distancia
+                port:
+                  number: 80
