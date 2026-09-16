@@ -1,0 +1,20 @@
+# Fase B do GitOps: conecta o ArgoCD ao chart do Helm, sem sync automatico
+# ainda (isso entra na Fase D, junto com o self-heal).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: conversao-distancia-producao
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lgpinfo/conversao-distancia.git
+    targetRevision: aws
+    path: helm/conversao-distancia
+    helm:
+      valueFiles:
+        - values-producao.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: producao
+  syncPolicy: {}

@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: conversao-distancia-homologacao
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lgpinfo/conversao-distancia.git
+    targetRevision: aws
+    path: helm/conversao-distancia
+    helm:
+      valueFiles:
+        - values-homologacao.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homologacao
+  syncPolicy: {}
