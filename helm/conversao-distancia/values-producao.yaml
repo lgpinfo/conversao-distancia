@@ -1,0 +1,12 @@
+namespace: producao
+topologySpreadEnabled: true
+
+appVersion: "1.1.0"
+
+ingress:
+  host: app.lgpcloud.com.br
+  tlsSecretName: conversao-distancia-tls-producao
+  clusterIssuer: letsencrypt-prod
+
+hpa:
+  enabled: true

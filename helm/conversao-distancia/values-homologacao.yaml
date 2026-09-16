@@ -1,0 +1,12 @@
+namespace: homologacao
+topologySpreadEnabled: false
+
+appVersion: "1.1.0-homolog"
+
+ingress:
+  host: homolog.lgpcloud.com.br
+  tlsSecretName: conversao-distancia-tls-homolog
+  clusterIssuer: letsencrypt-prod
+
+hpa:
+  enabled: false

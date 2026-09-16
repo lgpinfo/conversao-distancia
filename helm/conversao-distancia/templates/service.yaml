@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: conversao-distancia
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: conversao-distancia
+  ports:
+    - port: 80
+      targetPort: 8000

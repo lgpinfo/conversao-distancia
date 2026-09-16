@@ -1,0 +1,23 @@
+# Valores padrao -- cada ambiente sobrescreve so o que precisa, via
+# values-producao.yaml / values-homologacao.yaml (helm upgrade -f).
+
+namespace: default
+replicaCount: 2
+topologySpreadEnabled: false
+
+image:
+  repository: lproenca/conversao-distancia
+  tag: v1
+
+appVersion: "1.1.0"
+
+ingress:
+  host: exemplo.lgpcloud.com.br
+  tlsSecretName: conversao-distancia-tls
+  clusterIssuer: letsencrypt-staging
+
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilization: 60
