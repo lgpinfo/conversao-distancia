@@ -1,0 +1,31 @@
+# Ingress do Grafana -- dominio publico, mas protegido por Basic Auth
+# (annotations nginx.ingress.kubernetes.io/auth-*) alem do login proprio
+# do Grafana. Igual aos outros, comeca no issuer de staging pra validar
+# antes de gastar o limite do Let's Encrypt.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: grafana-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Autenticacao necessaria - Grafana"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - grafana.lgpcloud.com.br
+      secretName: grafana-tls
+  rules:
+    - host: grafana.lgpcloud.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kube-prometheus-stack-grafana
+                port:
+                  number: 80
