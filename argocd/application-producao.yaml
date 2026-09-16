@@ -1,7 +1,7 @@
-# Fase B do GitOps: conecta o ArgoCD ao chart do Helm.
-# Sync automatico ligado (nivel do meio dos 3) -- aplica sozinho toda
-# mudanca que aparecer no Git. Self-heal (desfazer kubectl edit manual)
-# fica pra Fase D.
+# Fase B/C/D do GitOps: conecta o ArgoCD ao chart do Helm, com sync
+# automatico + self-heal ligados -- qualquer mudanca manual feita direto
+# no cluster (kubectl edit) e desfeita automaticamente, revertendo pro
+# que o Git declara.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -20,4 +20,5 @@ spec:
     server: https://kubernetes.default.svc
     namespace: producao
   syncPolicy:
-    automated: {}
+    automated:
+      selfHeal: true
