@@ -2,7 +2,7 @@ namespace: producao
 topologySpreadEnabled: false
 
 image:
-  tag: 04497b6
+  tag: d23fc2f
 
 appVersion: "1.1.0"
 
