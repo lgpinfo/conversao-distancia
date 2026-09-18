@@ -1,11 +1,34 @@
-name: CI/CD Conversao-Distancia
-run-name: Infraestrutura Multi-Cloud via Terraform - Pipeline com EKS/AKS
+name: CI/CD AWS
+run-name: Deploy AWS via EKS (GitOps)
 
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main, aws]
+    paths:
+      # codigo/config compartilhados -- mudanca aqui afeta os dois clouds
+      - 'app.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - 'requirements-dev.txt'
+      - 'templates/**'
+      - 'static/**'
+      - 'helm/conversao-distancia/Chart.yaml'
+      - 'helm/conversao-distancia/values.yaml'
+      - 'helm/conversao-distancia/templates/**'
+      # especifico da AWS
+      - 'helm/conversao-distancia/values-producao.yaml'
+      - 'helm/conversao-distancia/values-homologacao.yaml'
+      - '.github/workflows/ci-cd-aws.yml'
+
+# Mesmo nome de grupo usado no pipeline da Azure -- se os dois dispararem
+# do mesmo push (por causa de um arquivo compartilhado), essa concurrency
+# forca um esperar o outro terminar, evitando corrida de git push na
+# mesma branch.
+concurrency:
+  group: git-values-write
+  cancel-in-progress: false
 
 env:
   IMAGE_NAME: lproenca/conversao-distancia
@@ -35,7 +58,7 @@ jobs:
   build-and-push:
     name: Build e publicação da imagem
     needs: ci
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws')
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.sha_short }}
@@ -67,7 +90,6 @@ jobs:
   deploy-homologacao:
     name: Deploy em Homologação (AWS)
     needs: build-and-push
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
     runs-on: ubuntu-latest
     environment: homologacao
     permissions:
@@ -93,7 +115,6 @@ jobs:
   deploy-producao:
     name: Deploy em Produção (AWS)
     needs: [build-and-push, deploy-homologacao]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
     runs-on: ubuntu-latest
     environment: producao
     permissions:
@@ -114,56 +135,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add helm/conversao-distancia/values-producao.yaml
           git commit -m "Atualiza imagem de producao (AWS) para ${{ needs.build-and-push.outputs.image_tag }} [skip ci]"
-          git push
-
-  deploy-homologacao-azure:
-    name: Deploy em Homologação (Azure)
-    needs: [build-and-push, deploy-producao]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
-    runs-on: ubuntu-latest
-    environment: homologacao
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Atualizar tag da imagem no values (GitOps)
-        run: |
-          sed -i "s/^  tag: .*/  tag: ${{ needs.build-and-push.outputs.image_tag }}/" helm/conversao-distancia/values-homologacao-azure.yaml
-
-      - name: Commit e push da mudança
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add helm/conversao-distancia/values-homologacao-azure.yaml
-          git commit -m "Atualiza imagem de homologacao (Azure) para ${{ needs.build-and-push.outputs.image_tag }} [skip ci]"
-          git push
-
-  deploy-producao-azure:
-    name: Deploy em Produção (Azure)
-    needs: [build-and-push, deploy-homologacao-azure]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
-    runs-on: ubuntu-latest
-    environment: producao
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Atualizar tag da imagem no values (GitOps)
-        run: |
-          sed -i "s/^  tag: .*/  tag: ${{ needs.build-and-push.outputs.image_tag }}/" helm/conversao-distancia/values-producao-azure.yaml
-
-      - name: Commit e push da mudança
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add helm/conversao-distancia/values-producao-azure.yaml
-          git commit -m "Atualiza imagem de producao (Azure) para ${{ needs.build-and-push.outputs.image_tag }} [skip ci]"
           git push
