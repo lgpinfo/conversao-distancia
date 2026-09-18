@@ -3,7 +3,7 @@ namespace: homologacao
 topologySpreadEnabled: false
 
 image:
-  tag: d23fc2f
+  tag: 2f9ccf0
 
 appVersion: "1.1.0-homolog"
 
