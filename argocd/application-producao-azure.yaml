@@ -1,0 +1,22 @@
+# ArgoCD proprio da Azure (nao o mesmo que roda na AWS) -- um por cluster,
+# mesmo principio de "espelhar" usado no resto do projeto.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: conversao-distancia-producao
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lgpinfo/conversao-distancia.git
+    targetRevision: aws
+    path: helm/conversao-distancia
+    helm:
+      valueFiles:
+        - values-producao-azure.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: producao
+  syncPolicy:
+    automated:
+      selfHeal: true

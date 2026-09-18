@@ -1,0 +1,15 @@
+namespace: homologacao
+topologySpreadEnabled: false
+
+image:
+  tag: v1
+
+appVersion: "1.1.0-homolog"
+
+ingress:
+  host: azure-homolog.lgpcloud.com.br
+  tlsSecretName: conversao-distancia-tls-homolog-azure
+  clusterIssuer: letsencrypt-staging
+
+hpa:
+  enabled: false
