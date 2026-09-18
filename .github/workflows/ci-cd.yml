@@ -118,7 +118,7 @@ jobs:
 
   deploy-homologacao-azure:
     name: Deploy em Homologação (Azure)
-    needs: build-and-push
+    needs: [build-and-push, deploy-producao]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/aws'
     runs-on: ubuntu-latest
     environment: homologacao
