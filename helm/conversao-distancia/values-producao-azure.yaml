@@ -9,7 +9,7 @@ appVersion: "1.1.0"
 ingress:
   host: azure.lgpcloud.com.br
   tlsSecretName: conversao-distancia-tls-producao-azure
-  clusterIssuer: letsencrypt-staging
+  clusterIssuer: letsencrypt-prod
 
 hpa:
   enabled: true

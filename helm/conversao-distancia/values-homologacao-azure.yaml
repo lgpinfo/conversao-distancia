@@ -9,7 +9,7 @@ appVersion: "1.1.0-homolog"
 ingress:
   host: azure-homolog.lgpcloud.com.br
   tlsSecretName: conversao-distancia-tls-homolog-azure
-  clusterIssuer: letsencrypt-staging
+  clusterIssuer: letsencrypt-prod
 
 hpa:
   enabled: false
