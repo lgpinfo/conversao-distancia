@@ -1,3 +1,4 @@
+# Teste: confirmar que so o pipeline da Azure dispara com essa mudanca
 namespace: homologacao
 topologySpreadEnabled: false
 
