@@ -150,3 +150,14 @@ Terraform-AWS/override.tf.json
 Terraform-AWS/*.tfplan
 Terraform-AWS/tfplan
 Terraform-AWS/plan-*.txt
+
+Terraform-Azure/.terraform/
+Terraform-Azure/*.tfstate
+Terraform-Azure/*.tfstate.*
+Terraform-Azure/*.tfvars
+Terraform-Azure/crash.log
+Terraform-Azure/override.tf
+Terraform-Azure/override.tf.json
+Terraform-Azure/*.tfplan
+Terraform-Azure/tfplan
+Terraform-Azure/plan-*.txt
