@@ -4,7 +4,7 @@ topologySpreadEnabled: false
 image:
   tag: d23fc2f
 
-appVersion: "1.1.0-homolog"
+appVersion: "1.2.0-homolog"
 
 ingress:
   host: homolog.lgpcloud.com.br
